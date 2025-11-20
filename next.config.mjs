@@ -5,7 +5,8 @@ const withPWA = withPWAInit({
   register: false,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  customWorkerDir: 'worker'
+  customWorkerDir: 'worker',
+  buildExcludes: [/app-build-manifest\.json$/]
 });
 
 /** @type {import('next').NextConfig} */
