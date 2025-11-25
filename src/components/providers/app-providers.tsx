@@ -30,7 +30,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   }, [isUpdateAvailable, applyUpdate]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
       <AppShell>{children}</AppShell>
       <Toaster />
     </ThemeProvider>

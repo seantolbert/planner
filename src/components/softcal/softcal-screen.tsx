@@ -1,0 +1,231 @@
+"use client";
+
+import { useState } from "react";
+import { Calendar, CheckSquare2, Plus, StickyNote } from "lucide-react";
+
+import { softcalEvents } from "./data/events";
+import { EventForm } from "./event-form";
+import { SoftcalDateSelector } from "./softcal-date-selector";
+import { SoftcalEventsGrid } from "./softcal-events-grid";
+import { ListModal } from "./list-modal";
+import { NoteForm } from "./note-form";
+import { SoftcalBottomSheet } from "./softcal-bottom-sheet";
+import { SoftcalTaskPanel } from "./softcal-task-panel";
+import { SoftcalTimeframeToggle } from "./softcal-timeframe-toggle";
+import { TaskForm } from "./task-form";
+import { useSoftcalDates } from "./hooks/use-softcal-dates";
+import { useSoftcalTasks } from "./hooks/use-softcal-tasks";
+import { useEventForm } from "./hooks/use-event-form";
+import { useNoteForm } from "./hooks/use-note-form";
+import { useTaskForm } from "./hooks/use-task-form";
+
+export function SoftcalScreen() {
+  const [fabOpen, setFabOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+
+  const {
+    state: noteState,
+    actions: noteActions,
+  } = useNoteForm(["Inbox", "Work", "Personal"]);
+
+  const {
+    state: taskState,
+    actions: taskActions,
+  } = useTaskForm();
+
+  const {
+    state: eventState,
+    actions: eventActions,
+  } = useEventForm();
+
+  const {
+    dayButtons,
+    activeIndex,
+    setActiveIndex,
+    monthLabel,
+    headerTitle,
+    highlight,
+    containerRef,
+    buttonRefs,
+  } = useSoftcalDates();
+
+  const {
+    topTasks,
+    showAll,
+    toggleShowAll,
+    totalTasks,
+    completedTasks,
+    completionRatio,
+    handleHoldStart,
+    handleHoldEnd,
+    holdingId,
+    taskColorStyles,
+    cardRef,
+    computedMaxHeight,
+  } = useSoftcalTasks();
+
+  const fabActions = [
+    { label: "Event", Icon: Calendar },
+    { label: "Note", Icon: StickyNote },
+    { label: "Task", Icon: CheckSquare2 },
+  ];
+
+  const openModal = (label: string) => {
+    setActiveModal(label);
+    setFabOpen(false);
+  };
+
+  const closeModal = () => setActiveModal(null);
+  const isModalOpen = Boolean(activeModal);
+
+  let modalContent: JSX.Element | null = null;
+
+  if (activeModal === "Note") {
+    modalContent = (
+      <NoteForm
+        title={noteState.title}
+        content={noteState.content}
+        link={noteState.link}
+        list={noteState.list}
+        listOptions={noteState.listOptions}
+        onChangeTitle={noteActions.setTitle}
+        onChangeContent={noteActions.setContent}
+        onChangeLink={noteActions.setLink}
+        onChangeList={noteActions.setList}
+        onOpenListModal={noteActions.openListModal}
+      />
+    );
+  } else if (activeModal === "Task") {
+    modalContent = (
+      <TaskForm
+        title={taskState.title}
+        notes={taskState.notes}
+        frequency={taskState.frequency}
+        noteRef={taskState.noteRef}
+        orderRef={taskState.orderRef}
+        eventRef={taskState.eventRef}
+        onChangeTitle={taskActions.setTitle}
+        onChangeNotes={taskActions.setNotes}
+        onChangeFrequency={taskActions.setFrequency}
+        onChangeNoteRef={taskActions.setNoteRef}
+        onChangeOrderRef={taskActions.setOrderRef}
+        onChangeEventRef={taskActions.setEventRef}
+      />
+    );
+  } else if (activeModal === "Event") {
+    modalContent = (
+      <EventForm
+        title={eventState.title}
+        start={eventState.start}
+        end={eventState.end}
+        notes={eventState.notes}
+        allDay={eventState.allDay}
+        color={eventState.color}
+        link={eventState.link}
+        onChangeTitle={eventActions.setTitle}
+        onChangeStart={eventActions.setStart}
+        onChangeEnd={eventActions.setEnd}
+        onChangeNotes={eventActions.setNotes}
+        onToggleAllDay={eventActions.setAllDay}
+        onChangeColor={eventActions.setColor}
+        onChangeLink={eventActions.setLink}
+      />
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen w-full bg-gradient-to-b from-[#0b111a] via-[#0f1724] to-[#0b111a] flex flex-col items-center px-4 py-10 text-white">
+      <SoftcalDateSelector
+        monthLabel={monthLabel}
+        dayButtons={dayButtons}
+        activeIndex={activeIndex}
+        onSelect={setActiveIndex}
+        highlight={highlight}
+        containerRef={containerRef}
+        buttonRefs={buttonRefs}
+      />
+
+      <SoftcalTaskPanel
+        headerTitle={headerTitle}
+        totalTasks={totalTasks}
+        completedTasks={completedTasks}
+        completionRatio={completionRatio}
+        topTasks={topTasks}
+        showAll={showAll}
+        onToggleShowAll={toggleShowAll}
+        onHoldStart={handleHoldStart}
+        onHoldEnd={handleHoldEnd}
+        holdingId={holdingId}
+        taskColorStyles={taskColorStyles}
+        cardRef={cardRef}
+        computedMaxHeight={computedMaxHeight}
+        isFirstDay={activeIndex === 0}
+        isLastDay={activeIndex === dayButtons.length - 1}
+      />
+
+      <div className="mb-4 text-white w-full max-w-5xl">
+        <h2 className="text-lg font-semibold">Upcoming events</h2>
+      </div>
+
+      <SoftcalTimeframeToggle />
+
+      <SoftcalEventsGrid events={softcalEvents} />
+
+      <div className="fixed bottom-6 right-6 z-50 md:bottom-10 md:right-10">
+        <div className="relative w-14">
+          {fabActions.map((action, index) => {
+            const offset = (index + 1) * 60;
+            const Icon = action.Icon;
+            return (
+              <button
+                key={action.label}
+                type="button"
+                aria-label={action.label}
+                className="absolute right-0 bottom-0 flex h-12 w-12 items-center justify-center rounded-full bg-[#182235] border border-white/30 text-white shadow-[0_10px_28px_rgba(0,0,0,0.3)] transition-all duration-200 ease-out hover:scale-[1.03]"
+                style={{
+                  bottom: fabOpen ? `${offset}px` : "0px",
+                  opacity: fabOpen ? 1 : 0,
+                  pointerEvents: fabOpen ? "auto" : "none",
+                }}
+                onClick={() => openModal(action.label)}
+              >
+                <Icon size={18} />
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          type="button"
+          aria-label="Toggle quick actions"
+          onClick={() => setFabOpen((prev) => !prev)}
+          className={`flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7cc5ff] to-[#4a9be0] text-[#0b111a] shadow-[0_14px_38px_rgba(0,0,0,0.35)] border border-white/40 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 ${
+            fabOpen ? "rotate-45" : "rotate-0"
+          }`}
+        >
+          <Plus size={24} strokeWidth={3} />
+        </button>
+      </div>
+
+      <SoftcalBottomSheet
+        open={isModalOpen}
+        title={activeModal}
+        onClose={closeModal}
+      >
+        {modalContent ?? (
+          <div>
+            This is placeholder content for the {activeModal?.toLowerCase() ?? "selected"} modal.
+          </div>
+        )}
+      </SoftcalBottomSheet>
+
+      <ListModal
+        open={noteState.showListModal}
+        newListName={noteState.newListName}
+        onChangeNewList={noteActions.setNewListName}
+        onSave={noteActions.handleAddList}
+        onClose={noteActions.closeListModal}
+      />
+    </div>
+  );
+}
