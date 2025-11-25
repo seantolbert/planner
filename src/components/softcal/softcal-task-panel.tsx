@@ -13,6 +13,7 @@ interface SoftcalTaskPanelProps {
   onToggleShowAll: () => void;
   onHoldStart: (id: string) => void;
   onHoldEnd: () => void;
+  onSelectTask: (task: SoftcalTask) => void;
   holdingId: string | null;
   taskColorStyles: Record<TaskFrequency | string, string>;
   cardRef: RefObject<HTMLDivElement>;
@@ -31,6 +32,7 @@ export function SoftcalTaskPanel({
   onToggleShowAll,
   onHoldStart,
   onHoldEnd,
+  onSelectTask,
   holdingId,
   taskColorStyles,
   cardRef,
@@ -81,7 +83,8 @@ export function SoftcalTaskPanel({
             onTouchStart={() => onHoldStart(task.id)}
             onTouchEnd={onHoldEnd}
             onTouchCancel={onHoldEnd}
-            className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition border ${
+            onClick={() => onSelectTask(task)}
+            className={`relative flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition border select-none overflow-hidden ${
               taskColorStyles[task.frequency] ??
               "border-white/10 bg-white/5 text-white/80"
             } ${
@@ -91,6 +94,13 @@ export function SoftcalTaskPanel({
             }`}
             type="button"
           >
+            <span
+              className="pointer-events-none absolute left-0 top-0 h-full rounded-xl border border-[#f6c56e]"
+              style={{
+                width: holdingId === task.id ? "100%" : "0%",
+                transition: "width 1000ms linear",
+              }}
+            />
             <div className="flex flex-col items-start gap-1 text-left">
               <span>{task.title}</span>
             </div>

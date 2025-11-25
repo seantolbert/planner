@@ -17,6 +17,7 @@ import { NoteForm } from "./note-form";
 import { SoftcalBottomSheet } from "./softcal-bottom-sheet";
 import { SoftcalTaskPanel } from "./softcal-task-panel";
 import { TaskForm } from "./task-form";
+import type { SoftcalTask } from "./softcal-types";
 import { useSoftcalDates } from "./hooks/use-softcal-dates";
 import { useSoftcalTasks } from "./hooks/use-softcal-tasks";
 import { useEventForm } from "./hooks/use-event-form";
@@ -27,7 +28,7 @@ export function SoftcalScreen() {
   const [fabOpen, setFabOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"Events" | "Notes" | "Orders">(
-    "Events"
+    "Orders"
   );
 
   const { state: noteState, actions: noteActions } = useNoteForm([
@@ -79,6 +80,17 @@ export function SoftcalScreen() {
 
   const closeModal = () => setActiveModal(null);
   const isModalOpen = Boolean(activeModal);
+
+  const handleTaskSelect = (task: SoftcalTask) => {
+    taskActions.setTitle(task.title);
+    taskActions.setNotes("");
+    taskActions.setFrequency(task.frequency);
+    taskActions.setNoteRef("");
+    taskActions.setOrderRef("");
+    taskActions.setEventRef("");
+    setActiveModal("Task");
+    setFabOpen(false);
+  };
 
   let modalContent: JSX.Element | null = null;
 
@@ -157,6 +169,7 @@ export function SoftcalScreen() {
         onToggleShowAll={toggleShowAll}
         onHoldStart={handleHoldStart}
         onHoldEnd={handleHoldEnd}
+        onSelectTask={handleTaskSelect}
         holdingId={holdingId}
         taskColorStyles={taskColorStyles}
         cardRef={cardRef}
@@ -168,9 +181,9 @@ export function SoftcalScreen() {
       <div className="w-full max-w-5xl mb-4">
         <div className="flex w-full items-center justify-between gap-2">
           {[
-            { label: "Events", Icon: Calendar },
-            { label: "Notes", Icon: StickyNote },
             { label: "Orders", Icon: Package },
+            { label: "Notes", Icon: StickyNote },
+            { label: "Events", Icon: Calendar },
           ].map(({ label, Icon }) => {
             const isActive = activeTab === label;
             return (
