@@ -14,6 +14,7 @@ interface SoftcalTaskPanelProps {
   onHoldStart: (id: string) => void;
   onHoldEnd: () => void;
   onSelectTask: (task: SoftcalTask) => void;
+  shouldIgnoreClick: (id: string) => boolean;
   holdingId: string | null;
   taskColorStyles: Record<TaskFrequency | string, string>;
   cardRef: RefObject<HTMLDivElement>;
@@ -36,6 +37,7 @@ export function SoftcalTaskPanel({
   onHoldStart,
   onHoldEnd,
   onSelectTask,
+  shouldIgnoreClick,
   holdingId,
   taskColorStyles,
   cardRef,
@@ -94,7 +96,10 @@ export function SoftcalTaskPanel({
               onTouchStart={() => onHoldStart(task.id)}
               onTouchEnd={onHoldEnd}
               onTouchCancel={onHoldEnd}
-              onClick={() => onSelectTask(task)}
+              onClick={() => {
+                if (shouldIgnoreClick(task.id)) return;
+                onSelectTask(task);
+              }}
               className={`relative flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition border select-none overflow-hidden ${
                 taskColorStyles[task.frequency] ??
                 "border-white/10 bg-white/5 text-white/80"

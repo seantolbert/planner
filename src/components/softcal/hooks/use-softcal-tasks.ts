@@ -28,6 +28,7 @@ export function useSoftcalTasks(initialTasks: BaseTask[] = placeholderTasks) {
   const [showAll, setShowAll] = useState(false);
   const [holdingId, setHoldingId] = useState<string | null>(null);
   const holdTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdCompletedId = useRef<string | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [collapsedHeight, setCollapsedHeight] = useState<number | null>(null);
   const [expandedHeight, setExpandedHeight] = useState<number | null>(null);
@@ -55,11 +56,13 @@ export function useSoftcalTasks(initialTasks: BaseTask[] = placeholderTasks) {
     if (holdTimeout.current) {
       clearTimeout(holdTimeout.current);
     }
+    holdCompletedId.current = null;
     setHoldingId(id);
     holdTimeout.current = setTimeout(() => {
       toggleTask(id);
       holdTimeout.current = null;
       setHoldingId(null);
+      holdCompletedId.current = id;
     }, 1000);
   };
 
@@ -96,6 +99,13 @@ export function useSoftcalTasks(initialTasks: BaseTask[] = placeholderTasks) {
     completionRatio,
     handleHoldStart,
     handleHoldEnd,
+    consumeHoldCompleted: (id: string) => {
+      if (holdCompletedId.current === id) {
+        holdCompletedId.current = null;
+        return true;
+      }
+      return false;
+    },
     holdingId,
     taskColorStyles: defaultTaskColorStyles,
     cardRef,

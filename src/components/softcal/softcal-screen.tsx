@@ -10,6 +10,11 @@ import {
 } from "lucide-react";
 
 import { CalendarWidget } from "./calendar-widget";
+import {
+  placeholderCalendarEvents,
+  placeholderNotes,
+  placeholderOrders,
+} from "./data/placeholders";
 import { EventForm } from "./event-form";
 import { SoftcalDateSelector } from "./softcal-date-selector";
 import { ListModal } from "./list-modal";
@@ -18,6 +23,7 @@ import { SoftcalBottomSheet } from "./softcal-bottom-sheet";
 import { SoftcalTaskPanel } from "./softcal-task-panel";
 import { TaskForm } from "./task-form";
 import type { SoftcalTask } from "./softcal-types";
+import type { PlaceholderNote } from "./data/placeholders";
 import type { CalendarEvent } from "./calendar-widget";
 import { useSoftcalDates } from "./hooks/use-softcal-dates";
 import { useSoftcalTasks } from "./hooks/use-softcal-tasks";
@@ -70,6 +76,7 @@ export function SoftcalScreen() {
     completionRatio,
     handleHoldStart,
     handleHoldEnd,
+    consumeHoldCompleted,
     holdingId,
     taskColorStyles,
     cardRef,
@@ -80,89 +87,6 @@ export function SoftcalScreen() {
     { label: "Event", Icon: Calendar },
     { label: "Note", Icon: StickyNote },
     { label: "Task", Icon: CheckSquare2 },
-  ];
-
-  const calendarPlaceholderEvents: CalendarEvent[] = [
-    {
-      title: "Product roadmap sync",
-      date: new Date(2025, 10, 3),
-      color: "blue",
-      startTime: "09:00",
-      endTime: "10:00",
-      notes: "Finalize Q1 priorities",
-    },
-    {
-      title: "Team offsite kickoff",
-      date: new Date(2025, 10, 5),
-      color: "orange",
-      startTime: "11:00",
-      endTime: "12:00",
-      notes: "Prep agenda and travel",
-    },
-    {
-      title: "Design review",
-      date: new Date(2025, 10, 8),
-      color: "green",
-      startTime: "14:00",
-      endTime: "15:00",
-      notes: "UI polish for launch",
-    },
-    {
-      title: "Customer demo",
-      date: new Date(2025, 10, 10),
-      color: "yellow",
-      startTime: "10:30",
-      endTime: "11:15",
-      notes: "Show new dashboard",
-    },
-    {
-      title: "Content planning",
-      date: new Date(2025, 10, 12),
-      color: "blue",
-      startTime: "13:00",
-      endTime: "14:00",
-      notes: "Blog + email calendar",
-    },
-    {
-      title: "Sprint retro",
-      date: new Date(2025, 10, 15),
-      color: "orange",
-      startTime: "16:00",
-      endTime: "17:00",
-      notes: "Wins + improvements",
-    },
-    {
-      title: "Budget check-in",
-      date: new Date(2025, 10, 18),
-      color: "green",
-      startTime: "09:30",
-      endTime: "10:15",
-      notes: "Capex review",
-    },
-    {
-      title: "Hiring panel",
-      date: new Date(2025, 10, 21),
-      color: "yellow",
-      startTime: "15:00",
-      endTime: "16:30",
-      notes: "Frontend candidate",
-    },
-    {
-      title: "Partner sync",
-      date: new Date(2025, 10, 25),
-      color: "blue",
-      startTime: "11:30",
-      endTime: "12:15",
-      notes: "API alignment",
-    },
-    {
-      title: "Release launch",
-      date: new Date(2025, 10, 28),
-      color: "orange",
-      startTime: "08:00",
-      endTime: "09:00",
-      notes: "Go/no-go + rollout",
-    },
   ];
 
   const openModal = (label: string) => {
@@ -184,24 +108,20 @@ export function SoftcalScreen() {
     setFabOpen(false);
   };
 
-  const selectedDayEvents = calendarPlaceholderEvents.filter(
+  const handleNoteSelect = (note: PlaceholderNote) => {
+    noteActions.setTitle(note.title);
+    noteActions.setContent(note.content);
+    noteActions.setLink(note.link ?? "");
+    setActiveModal("Note");
+    setFabOpen(false);
+  };
+
+  const selectedDayEvents = placeholderCalendarEvents.filter(
     (event) =>
       event.date.getFullYear() === selectedDate.getFullYear() &&
       event.date.getMonth() === selectedDate.getMonth() &&
       event.date.getDate() === selectedDate.getDate()
   );
-  const placeholderOrders = [
-    { date: new Date(2025, 10, 3), count: 12 },
-    { date: new Date(2025, 10, 5), count: 4 },
-    { date: new Date(2025, 10, 8), count: 9 },
-    { date: new Date(2025, 10, 10), count: 6 },
-    { date: new Date(2025, 10, 12), count: 3 },
-    { date: new Date(2025, 10, 15), count: 11 },
-    { date: new Date(2025, 10, 18), count: 7 },
-    { date: new Date(2025, 10, 21), count: 5 },
-    { date: new Date(2025, 10, 25), count: 8 },
-    { date: new Date(2025, 10, 28), count: 10 },
-  ];
   const selectedDayOrders =
     placeholderOrders.find(
       (order) =>
@@ -209,7 +129,7 @@ export function SoftcalScreen() {
         order.date.getMonth() === selectedDate.getMonth() &&
         order.date.getDate() === selectedDate.getDate()
     )?.count ?? 0;
-  const eventModalEvents = calendarPlaceholderEvents.filter(
+  const eventModalEvents = placeholderCalendarEvents.filter(
     (event) =>
       event.date.getFullYear() === eventModalDate.getFullYear() &&
       event.date.getMonth() === eventModalDate.getMonth() &&
@@ -220,7 +140,6 @@ export function SoftcalScreen() {
     day: "numeric",
     year: "numeric",
   });
-
 
   const toDateTimeLocal = (date: Date, time?: string) => {
     const iso = new Date(date);
@@ -320,7 +239,8 @@ export function SoftcalScreen() {
                 <span
                   className="h-2 w-2 rounded-full"
                   style={{
-                    backgroundColor: colorHexMap[event.color ?? ""] ?? "#7cc5ff",
+                    backgroundColor:
+                      colorHexMap[event.color ?? ""] ?? "#7cc5ff",
                   }}
                 />
                 <div className="flex flex-col">
@@ -363,6 +283,7 @@ export function SoftcalScreen() {
         onHoldStart={handleHoldStart}
         onHoldEnd={handleHoldEnd}
         onSelectTask={handleTaskSelect}
+        shouldIgnoreClick={(id) => consumeHoldCompleted(id)}
         holdingId={holdingId}
         taskColorStyles={taskColorStyles}
         cardRef={cardRef}
@@ -371,10 +292,14 @@ export function SoftcalScreen() {
         isLastDay={activeIndex === dayButtons.length - 1}
         rightButtonLabel={
           selectedDayEvents.length
-            ? `${selectedDayEvents.length} event${selectedDayEvents.length === 1 ? "" : "s"}`
+            ? `${selectedDayEvents.length} event${
+                selectedDayEvents.length === 1 ? "" : "s"
+              }`
             : "No events today"
         }
-        rightBottomLabel={`${selectedDayOrders} order${selectedDayOrders === 1 ? "" : "s"}`}
+        rightBottomLabel={`${selectedDayOrders} order${
+          selectedDayOrders === 1 ? "" : "s"
+        }`}
         onRightButtonClick={() => {
           setEventModalDate(selectedDate);
           setActiveModal("Day Events");
@@ -408,12 +333,12 @@ export function SoftcalScreen() {
         </div>
       </div>
 
-          {activeTab === "Events" ? (
+      {activeTab === "Events" ? (
         <>
           <div className="w-full max-w-5xl">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
               <CalendarWidget
-                events={calendarPlaceholderEvents}
+                events={placeholderCalendarEvents}
                 onDaySelect={(date) => {
                   setEventModalDate(date);
                   setActiveModal("Day Events");
@@ -435,8 +360,23 @@ export function SoftcalScreen() {
       ) : null}
 
       {activeTab === "Notes" ? (
-        <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/80">
-          Notes tab content coming soon.
+        <div className="grid grid-cols-2 gap-4 w-full max-w-5xl mx-auto">
+          {placeholderNotes.slice(0, 6).map((note, idx) => (
+            <div
+              key={`${note.title}-${idx}`}
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 cursor-pointer hover:bg-white/10 transition"
+              onClick={() => handleNoteSelect(note)}
+            >
+              <div className="text-white font-semibold">{note.title}</div>
+              <div className="text-white/70 text-sm">{note.content}</div>
+              {note.link ? (
+                <div className="text-[#7cc5ff] text-sm mt-1">{note.link}</div>
+              ) : null}
+              <div className="mt-2 text-[11px] text-white/50">
+                Created: {note.createdAt} • Updated: {note.updatedAt}
+              </div>
+            </div>
+          ))}
         </div>
       ) : null}
 
