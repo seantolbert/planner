@@ -82,7 +82,7 @@ export function SoftcalScreen() {
     { label: "Task", Icon: CheckSquare2 },
   ];
 
-  const calendarPlaceholderEvents = [
+  const calendarPlaceholderEvents: CalendarEvent[] = [
     {
       title: "Product roadmap sync",
       date: new Date(2025, 10, 3),
