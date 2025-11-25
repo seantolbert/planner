@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, CheckSquare2, Plus, StickyNote } from "lucide-react";
+import {
+  Calendar,
+  CheckSquare2,
+  Package,
+  Plus,
+  StickyNote,
+} from "lucide-react";
 
-import { softcalEvents } from "./data/events";
+import { CalendarWidget } from "./calendar-widget";
 import { EventForm } from "./event-form";
 import { SoftcalDateSelector } from "./softcal-date-selector";
-import { SoftcalEventsGrid } from "./softcal-events-grid";
 import { ListModal } from "./list-modal";
 import { NoteForm } from "./note-form";
 import { SoftcalBottomSheet } from "./softcal-bottom-sheet";
 import { SoftcalTaskPanel } from "./softcal-task-panel";
-import { SoftcalTimeframeToggle } from "./softcal-timeframe-toggle";
 import { TaskForm } from "./task-form";
 import { useSoftcalDates } from "./hooks/use-softcal-dates";
 import { useSoftcalTasks } from "./hooks/use-softcal-tasks";
@@ -22,21 +26,19 @@ import { useTaskForm } from "./hooks/use-task-form";
 export function SoftcalScreen() {
   const [fabOpen, setFabOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"Events" | "Notes" | "Orders">(
+    "Events"
+  );
 
-  const {
-    state: noteState,
-    actions: noteActions,
-  } = useNoteForm(["Inbox", "Work", "Personal"]);
+  const { state: noteState, actions: noteActions } = useNoteForm([
+    "Inbox",
+    "Work",
+    "Personal",
+  ]);
 
-  const {
-    state: taskState,
-    actions: taskActions,
-  } = useTaskForm();
+  const { state: taskState, actions: taskActions } = useTaskForm();
 
-  const {
-    state: eventState,
-    actions: eventActions,
-  } = useEventForm();
+  const { state: eventState, actions: eventActions } = useEventForm();
 
   const {
     dayButtons,
@@ -134,7 +136,7 @@ export function SoftcalScreen() {
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-b from-[#0b111a] via-[#0f1724] to-[#0b111a] flex flex-col items-center px-4 py-10 text-white">
+    <div className="relative min-h-screen w-full bg-gradient-to-b flex flex-col items-center px-4 text-white">
       <SoftcalDateSelector
         monthLabel={monthLabel}
         dayButtons={dayButtons}
@@ -163,13 +165,54 @@ export function SoftcalScreen() {
         isLastDay={activeIndex === dayButtons.length - 1}
       />
 
-      <div className="mb-4 text-white w-full max-w-5xl">
-        <h2 className="text-lg font-semibold">Upcoming events</h2>
+      <div className="w-full max-w-5xl mb-4">
+        <div className="flex w-full items-center justify-between gap-2">
+          {[
+            { label: "Events", Icon: Calendar },
+            { label: "Notes", Icon: StickyNote },
+            { label: "Orders", Icon: Package },
+          ].map(({ label, Icon }) => {
+            const isActive = activeTab === label;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setActiveTab(label as typeof activeTab)}
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition border ${
+                  isActive
+                    ? "border-[#7cc5ff] bg-[#7cc5ff]/10 text-white shadow-[0_10px_24px_rgba(0,0,0,0.25)]"
+                    : "border-white/10 bg-[#141c2a] text-white/70 hover:text-white"
+                }`}
+              >
+                <Icon size={16} />
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <SoftcalTimeframeToggle />
+      {activeTab === "Events" ? (
+        <>
+          <div className="w-full max-w-5xl">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+              <CalendarWidget events={[]} />
+            </div>
+          </div>
+        </>
+      ) : null}
 
-      <SoftcalEventsGrid events={softcalEvents} />
+      {activeTab === "Notes" ? (
+        <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/80">
+          Notes tab content coming soon.
+        </div>
+      ) : null}
+
+      {activeTab === "Orders" ? (
+        <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/80">
+          Orders tab content coming soon.
+        </div>
+      ) : null}
 
       <div className="fixed bottom-6 right-6 z-50 md:bottom-10 md:right-10">
         <div className="relative w-14">
@@ -214,7 +257,8 @@ export function SoftcalScreen() {
       >
         {modalContent ?? (
           <div>
-            This is placeholder content for the {activeModal?.toLowerCase() ?? "selected"} modal.
+            This is placeholder content for the{" "}
+            {activeModal?.toLowerCase() ?? "selected"} modal.
           </div>
         )}
       </SoftcalBottomSheet>
