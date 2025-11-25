@@ -4,11 +4,14 @@ import { useMemo, useState } from "react";
 
 import "./calendar-widget.css";
 
-type CalendarEvent = {
+export type CalendarEvent = {
   title: string;
   date: Date;
   color?: "blue" | "orange" | "green" | "yellow";
   calendar?: string;
+  startTime?: string;
+  endTime?: string;
+  notes?: string;
 };
 
 function isSameDay(a: Date, b: Date) {
@@ -36,7 +39,13 @@ function addDays(date: Date, amount: number) {
   return next;
 }
 
-export function CalendarWidget({ events = [] }: { events?: CalendarEvent[] }) {
+export function CalendarWidget({
+  events = [],
+  onDaySelect,
+}: {
+  events?: CalendarEvent[];
+  onDaySelect?: (date: Date, events: CalendarEvent[]) => void;
+}) {
   const today = useMemo(() => new Date(), []);
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(today));
   const [selectedDay, setSelectedDay] = useState<Date>(today);
@@ -125,6 +134,7 @@ export function CalendarWidget({ events = [] }: { events?: CalendarEvent[] }) {
                     }`}
                     onClick={() => {
                       setSelectedDay(day.date);
+                      onDaySelect?.(day.date, day.events);
                     }}
                   >
                     <div className="day-name">{dayName}</div>

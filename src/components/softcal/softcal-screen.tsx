@@ -18,6 +18,7 @@ import { SoftcalBottomSheet } from "./softcal-bottom-sheet";
 import { SoftcalTaskPanel } from "./softcal-task-panel";
 import { TaskForm } from "./task-form";
 import type { SoftcalTask } from "./softcal-types";
+import type { CalendarEvent } from "./calendar-widget";
 import { useSoftcalDates } from "./hooks/use-softcal-dates";
 import { useSoftcalTasks } from "./hooks/use-softcal-tasks";
 import { useEventForm } from "./hooks/use-event-form";
@@ -27,9 +28,9 @@ import { useTaskForm } from "./hooks/use-task-form";
 export function SoftcalScreen() {
   const [fabOpen, setFabOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"Events" | "Notes" | "Orders">(
-    "Orders"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "Events" | "Notes" | "Orders" | "Tracking"
+  >("Orders");
 
   const { state: noteState, actions: noteActions } = useNoteForm([
     "Inbox",
@@ -40,6 +41,12 @@ export function SoftcalScreen() {
   const { state: taskState, actions: taskActions } = useTaskForm();
 
   const { state: eventState, actions: eventActions } = useEventForm();
+  const colorHexMap: Record<string, string> = {
+    blue: "#7cc5ff",
+    orange: "#f7a700",
+    green: "#99c66d",
+    yellow: "#f9e900",
+  };
 
   const {
     dayButtons,
@@ -47,10 +54,12 @@ export function SoftcalScreen() {
     setActiveIndex,
     monthLabel,
     headerTitle,
+    selectedDate,
     highlight,
     containerRef,
     buttonRefs,
   } = useSoftcalDates();
+  const [eventModalDate, setEventModalDate] = useState<Date>(selectedDate);
 
   const {
     topTasks,
@@ -73,6 +82,89 @@ export function SoftcalScreen() {
     { label: "Task", Icon: CheckSquare2 },
   ];
 
+  const calendarPlaceholderEvents = [
+    {
+      title: "Product roadmap sync",
+      date: new Date(2025, 10, 3),
+      color: "blue",
+      startTime: "09:00",
+      endTime: "10:00",
+      notes: "Finalize Q1 priorities",
+    },
+    {
+      title: "Team offsite kickoff",
+      date: new Date(2025, 10, 5),
+      color: "orange",
+      startTime: "11:00",
+      endTime: "12:00",
+      notes: "Prep agenda and travel",
+    },
+    {
+      title: "Design review",
+      date: new Date(2025, 10, 8),
+      color: "green",
+      startTime: "14:00",
+      endTime: "15:00",
+      notes: "UI polish for launch",
+    },
+    {
+      title: "Customer demo",
+      date: new Date(2025, 10, 10),
+      color: "yellow",
+      startTime: "10:30",
+      endTime: "11:15",
+      notes: "Show new dashboard",
+    },
+    {
+      title: "Content planning",
+      date: new Date(2025, 10, 12),
+      color: "blue",
+      startTime: "13:00",
+      endTime: "14:00",
+      notes: "Blog + email calendar",
+    },
+    {
+      title: "Sprint retro",
+      date: new Date(2025, 10, 15),
+      color: "orange",
+      startTime: "16:00",
+      endTime: "17:00",
+      notes: "Wins + improvements",
+    },
+    {
+      title: "Budget check-in",
+      date: new Date(2025, 10, 18),
+      color: "green",
+      startTime: "09:30",
+      endTime: "10:15",
+      notes: "Capex review",
+    },
+    {
+      title: "Hiring panel",
+      date: new Date(2025, 10, 21),
+      color: "yellow",
+      startTime: "15:00",
+      endTime: "16:30",
+      notes: "Frontend candidate",
+    },
+    {
+      title: "Partner sync",
+      date: new Date(2025, 10, 25),
+      color: "blue",
+      startTime: "11:30",
+      endTime: "12:15",
+      notes: "API alignment",
+    },
+    {
+      title: "Release launch",
+      date: new Date(2025, 10, 28),
+      color: "orange",
+      startTime: "08:00",
+      endTime: "09:00",
+      notes: "Go/no-go + rollout",
+    },
+  ];
+
   const openModal = (label: string) => {
     setActiveModal(label);
     setFabOpen(false);
@@ -90,6 +182,67 @@ export function SoftcalScreen() {
     taskActions.setEventRef("");
     setActiveModal("Task");
     setFabOpen(false);
+  };
+
+  const selectedDayEvents = calendarPlaceholderEvents.filter(
+    (event) =>
+      event.date.getFullYear() === selectedDate.getFullYear() &&
+      event.date.getMonth() === selectedDate.getMonth() &&
+      event.date.getDate() === selectedDate.getDate()
+  );
+  const placeholderOrders = [
+    { date: new Date(2025, 10, 3), count: 12 },
+    { date: new Date(2025, 10, 5), count: 4 },
+    { date: new Date(2025, 10, 8), count: 9 },
+    { date: new Date(2025, 10, 10), count: 6 },
+    { date: new Date(2025, 10, 12), count: 3 },
+    { date: new Date(2025, 10, 15), count: 11 },
+    { date: new Date(2025, 10, 18), count: 7 },
+    { date: new Date(2025, 10, 21), count: 5 },
+    { date: new Date(2025, 10, 25), count: 8 },
+    { date: new Date(2025, 10, 28), count: 10 },
+  ];
+  const selectedDayOrders =
+    placeholderOrders.find(
+      (order) =>
+        order.date.getFullYear() === selectedDate.getFullYear() &&
+        order.date.getMonth() === selectedDate.getMonth() &&
+        order.date.getDate() === selectedDate.getDate()
+    )?.count ?? 0;
+  const eventModalEvents = calendarPlaceholderEvents.filter(
+    (event) =>
+      event.date.getFullYear() === eventModalDate.getFullYear() &&
+      event.date.getMonth() === eventModalDate.getMonth() &&
+      event.date.getDate() === eventModalDate.getDate()
+  );
+  const eventModalDateLabel = eventModalDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+
+  const toDateTimeLocal = (date: Date, time?: string) => {
+    const iso = new Date(date);
+    if (time) {
+      const [h = "0", m = "0"] = time.split(":");
+      iso.setHours(Number(h), Number(m), 0, 0);
+    }
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${iso.getFullYear()}-${pad(iso.getMonth() + 1)}-${pad(
+      iso.getDate()
+    )}T${pad(iso.getHours())}:${pad(iso.getMinutes())}`;
+  };
+
+  const handleDayEventSelect = (event: CalendarEvent) => {
+    eventActions.setTitle(event.title);
+    eventActions.setStart(toDateTimeLocal(event.date, event.startTime));
+    eventActions.setEnd(toDateTimeLocal(event.date, event.endTime));
+    eventActions.setNotes(event.notes ?? "");
+    eventActions.setAllDay(false);
+    eventActions.setColor(colorHexMap[event.color ?? ""] ?? "#7cc5ff");
+    eventActions.setLink("");
+    setActiveModal("Event");
   };
 
   let modalContent: JSX.Element | null = null;
@@ -145,6 +298,46 @@ export function SoftcalScreen() {
         onChangeLink={eventActions.setLink}
       />
     );
+  } else if (activeModal === "Day Events") {
+    modalContent = (
+      <div className="space-y-3">
+        <div className="text-sm font-semibold text-white/80">
+          {eventModalDateLabel}
+        </div>
+        {eventModalEvents.length === 0 ? (
+          <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70">
+            No events today
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {eventModalEvents.map((event, idx) => (
+              <button
+                key={`${event.title}-${idx}`}
+                type="button"
+                onClick={() => handleDayEventSelect(event)}
+                className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-sm text-white hover:bg-white/10 transition"
+              >
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{
+                    backgroundColor: colorHexMap[event.color ?? ""] ?? "#7cc5ff",
+                  }}
+                />
+                <div className="flex flex-col">
+                  <span className="font-semibold">{event.title}</span>
+                  <span className="text-white/70">
+                    {event.startTime ?? "—"} - {event.endTime ?? "—"}
+                  </span>
+                  {event.notes ? (
+                    <span className="text-white/60 text-xs">{event.notes}</span>
+                  ) : null}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -176,40 +369,66 @@ export function SoftcalScreen() {
         computedMaxHeight={computedMaxHeight}
         isFirstDay={activeIndex === 0}
         isLastDay={activeIndex === dayButtons.length - 1}
+        rightButtonLabel={
+          selectedDayEvents.length
+            ? `${selectedDayEvents.length} event${selectedDayEvents.length === 1 ? "" : "s"}`
+            : "No events today"
+        }
+        rightBottomLabel={`${selectedDayOrders} order${selectedDayOrders === 1 ? "" : "s"}`}
+        onRightButtonClick={() => {
+          setEventModalDate(selectedDate);
+          setActiveModal("Day Events");
+        }}
       />
 
       <div className="w-full max-w-5xl mb-4">
         <div className="flex w-full items-center justify-between gap-2">
           {[
-            { label: "Orders", Icon: Package },
-            { label: "Notes", Icon: StickyNote },
-            { label: "Events", Icon: Calendar },
-          ].map(({ label, Icon }) => {
-            const isActive = activeTab === label;
+            { key: "Orders", Icon: Package },
+            { key: "Notes", Icon: StickyNote },
+            { key: "Events", Icon: Calendar },
+            { key: "Tracking", Icon: CheckSquare2 },
+          ].map(({ key, Icon }) => {
+            const isActive = activeTab === key;
             return (
               <button
-                key={label}
+                key={key}
                 type="button"
-                onClick={() => setActiveTab(label as typeof activeTab)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition border ${
+                onClick={() => setActiveTab(key as typeof activeTab)}
+                className={`flex items-center justify-center rounded-full p-3 text-sm font-semibold transition border ${
                   isActive
                     ? "border-[#7cc5ff] bg-[#7cc5ff]/10 text-white shadow-[0_10px_24px_rgba(0,0,0,0.25)]"
                     : "border-white/10 bg-[#141c2a] text-white/70 hover:text-white"
                 }`}
               >
-                <Icon size={16} />
-                {label}
+                <Icon size={18} />
               </button>
             );
           })}
         </div>
       </div>
 
-      {activeTab === "Events" ? (
+          {activeTab === "Events" ? (
         <>
           <div className="w-full max-w-5xl">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-              <CalendarWidget events={[]} />
+              <CalendarWidget
+                events={calendarPlaceholderEvents}
+                onDaySelect={(date) => {
+                  setEventModalDate(date);
+                  setActiveModal("Day Events");
+                  // sync the date selector with calendar tap
+                  const matchIndex = dayButtons.findIndex(
+                    (d) =>
+                      d.date.getFullYear() === date.getFullYear() &&
+                      d.date.getMonth() === date.getMonth() &&
+                      d.date.getDate() === date.getDate()
+                  );
+                  if (matchIndex >= 0) {
+                    setActiveIndex(matchIndex);
+                  }
+                }}
+              />
             </div>
           </div>
         </>
@@ -224,6 +443,12 @@ export function SoftcalScreen() {
       {activeTab === "Orders" ? (
         <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/80">
           Orders tab content coming soon.
+        </div>
+      ) : null}
+
+      {activeTab === "Tracking" ? (
+        <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/80">
+          Tracking tab content coming soon.
         </div>
       ) : null}
 

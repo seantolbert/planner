@@ -50,30 +50,32 @@ export function EventForm({
           placeholder="Event name"
         />
       </div>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="space-y-2">
-          <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-            Start at
-          </label>
-          <input
-            type="datetime-local"
-            value={start}
-            onChange={(event) => onChangeStart(event.target.value)}
-            className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/40 focus:border-[#7cc5ff] focus:outline-none"
-          />
+      {!allDay ? (
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+              Start at
+            </label>
+            <input
+              type="datetime-local"
+              value={start}
+              onChange={(event) => onChangeStart(event.target.value)}
+              className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/40 focus:border-[#7cc5ff] focus:outline-none"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+              End at
+            </label>
+            <input
+              type="datetime-local"
+              value={end}
+              onChange={(event) => onChangeEnd(event.target.value)}
+              className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/40 focus:border-[#7cc5ff] focus:outline-none"
+            />
+          </div>
         </div>
-        <div className="space-y-2">
-          <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-            End at
-          </label>
-          <input
-            type="datetime-local"
-            value={end}
-            onChange={(event) => onChangeEnd(event.target.value)}
-            className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/40 focus:border-[#7cc5ff] focus:outline-none"
-          />
-        </div>
-      </div>
+      ) : null}
       <div className="flex items-center gap-3">
         <label className="flex items-center gap-2 text-sm text-white/80">
           <input
