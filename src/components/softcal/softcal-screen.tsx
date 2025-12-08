@@ -50,17 +50,7 @@ export function SoftcalScreen() {
     yellow: "#f9e900",
   };
 
-  const {
-    dayButtons,
-    activeIndex,
-    setActiveIndex,
-    monthLabel,
-    headerTitle,
-    selectedDate,
-    highlight,
-    containerRef,
-    buttonRefs,
-  } = useSoftcalDates();
+  const { dayButtons, activeIndex, setActiveIndex, selectedDate } = useSoftcalDates();
   const [eventModalDate, setEventModalDate] = useState<Date>(selectedDate);
 
   const {
@@ -261,50 +251,6 @@ export function SoftcalScreen() {
 
   return (
     <div className="relative min-h-screen w-full bg-gradient-to-b flex flex-col items-center px-4 text-white">
-      <SoftcalDateSelector
-        monthLabel={monthLabel}
-        dayButtons={dayButtons}
-        activeIndex={activeIndex}
-        onSelect={setActiveIndex}
-        highlight={highlight}
-        containerRef={containerRef}
-        buttonRefs={buttonRefs}
-      />
-
-      <SoftcalTaskPanel
-        headerTitle={headerTitle}
-        totalTasks={totalTasks}
-        completedTasks={completedTasks}
-        completionRatio={completionRatio}
-        topTasks={topTasks}
-        showAll={showAll}
-        onToggleShowAll={toggleShowAll}
-        onHoldStart={handleHoldStart}
-        onHoldEnd={handleHoldEnd}
-        onSelectTask={handleTaskSelect}
-        shouldIgnoreClick={(id) => consumeHoldCompleted(id)}
-        holdingId={holdingId}
-        taskColorStyles={taskColorStyles}
-        cardRef={cardRef}
-        computedMaxHeight={computedMaxHeight}
-        isFirstDay={activeIndex === 0}
-        isLastDay={activeIndex === dayButtons.length - 1}
-        rightButtonLabel={
-          selectedDayEvents.length
-            ? `${selectedDayEvents.length} event${
-                selectedDayEvents.length === 1 ? "" : "s"
-              }`
-            : "No events today"
-        }
-        rightBottomLabel={`${selectedDayOrders} order${
-          selectedDayOrders === 1 ? "" : "s"
-        }`}
-        onRightButtonClick={() => {
-          setEventModalDate(selectedDate);
-          setActiveModal("Day Events");
-        }}
-      />
-
       <div className="w-full max-w-5xl mb-4">
         <div className="flex w-full items-center justify-between gap-2">
           {[
@@ -331,32 +277,6 @@ export function SoftcalScreen() {
           })}
         </div>
       </div>
-
-      {activeTab === "Events" ? (
-        <>
-          <div className="w-full max-w-5xl">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-              <CalendarWidget
-                events={placeholderCalendarEvents}
-                onDaySelect={(date) => {
-                  setEventModalDate(date);
-                  setActiveModal("Day Events");
-                  // sync the date selector with calendar tap
-                  const matchIndex = dayButtons.findIndex(
-                    (d) =>
-                      d.date.getFullYear() === date.getFullYear() &&
-                      d.date.getMonth() === date.getMonth() &&
-                      d.date.getDate() === date.getDate()
-                  );
-                  if (matchIndex >= 0) {
-                    setActiveIndex(matchIndex);
-                  }
-                }}
-              />
-            </div>
-          </div>
-        </>
-      ) : null}
 
       {activeTab === "Notes" ? (
         <div className="grid grid-cols-2 gap-4 w-full max-w-5xl mx-auto">
