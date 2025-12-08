@@ -119,20 +119,20 @@ export function SoftcalSideNav({
 
         {showFab ? (
           <div className="relative mt-auto w-full">
-            <div className="absolute bottom-12 left-0 -translate-x-1/2">
-              <div className="relative w-14">
-                {/* Stack of quick actions that animate upward when fabOpen toggles. */}
+            <div className="absolute bottom-5 left-0 -translate-x-1/2">
+              <div className="relative h-16 w-48">
+                {/* Row of quick actions that slide left when fabOpen toggles. */}
                 {fabActions.map((action, index) => {
-                  const offset = (index + 1) * 60; // tighter spacing so the stack hugs the rail.
+                  const offset = (index + 1) * 64;
                   const Icon = action.Icon;
                   return (
                     <button
                       key={action.label}
                       type="button"
                       aria-label={action.label}
-                      className="absolute right-0 bottom-0 flex h-[52px] w-[52px] items-center justify-center rounded-full border border-[#c2d1ed] bg-gradient-to-br from-[#e3edff] to-[#d2e1fb] text-[#0b1a2f] shadow-[0_12px_30px_rgba(13,34,79,0.16)] ring-2 ring-[#7cb5ff]/60 transition-all duration-200 ease-out hover:scale-[1.05] hover:ring-[#5fa1ff]/80"
+                      className="absolute top-1/2 left-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-[#c2d1ed] bg-gradient-to-br from-[#e3edff] to-[#d2e1fb] text-[#0b1a2f] shadow-[0_12px_30px_rgba(13,34,79,0.16)] ring-2 ring-[#7cb5ff]/60 transition-all duration-200 ease-out hover:scale-[1.05] hover:ring-[#5fa1ff]/80"
                       style={{
-                        bottom: fabOpen ? `${offset}px` : "0px",
+                        transform: `translate(${fabOpen ? `calc(-50% - ${offset}px)` : "-50%"}, -50%)`,
                         opacity: fabOpen ? 1 : 0,
                         pointerEvents: fabOpen ? "auto" : "none",
                       }}
