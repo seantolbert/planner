@@ -107,10 +107,8 @@ export function SoftcalSideNav({
                   setActiveLabel(label);
                   onSelectNav(label);
                 }}
-                className={`group relative flex h-11 w-11 items-center justify-center rounded-xl text-[#0f1c33]/70 transition ${
-                  activeLabel === label
-                    ? "text-[#f5f7fc]"
-                    : "hover:text-[#848d99]"
+                className={`group relative flex h-11 w-11 items-center justify-center rounded-xl text-[#7cc5ff] transition ${
+                  activeLabel === label ? "text-[#7cc5ff]" : "hover:text-[#7cc5ff]"
                 }`}
               >
                 <Icon size={25} strokeWidth={1.75} />
