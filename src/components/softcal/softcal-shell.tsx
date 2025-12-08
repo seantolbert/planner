@@ -76,7 +76,7 @@ export function SoftcalShell({ children }: SoftcalShellProps) {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-gradient-to-b from-[#0b111a] to-[#0f1522] px-4 pr-12
+      className="relative min-h-screen w-full bg-gradient-to-b from-[#0b111a] to-[#0f1522] pr-12
      lg:pr-32 text-white"
     >
       <style jsx global>{`
@@ -104,7 +104,10 @@ export function SoftcalShell({ children }: SoftcalShellProps) {
           background: transparent;
         }
       `}</style>
-      <div className="pointer-events-none fixed left-2 top-0 z-30 flex h-full w-2 items-start justify-center py-3 transition-opacity duration-300" style={{ opacity: scrollVisible ? 1 : 0 }}>
+      <div
+        className="pointer-events-none fixed left-2 top-0 z-30 flex h-full w-2 items-start justify-center py-3 transition-opacity duration-300"
+        style={{ opacity: scrollVisible ? 1 : 0 }}
+      >
         <div className="relative h-full w-full rounded-full bg-white/5">
           <div
             className="absolute left-0 top-0 w-full rounded-full bg-[#7cc5ff]"
@@ -124,7 +127,7 @@ export function SoftcalShell({ children }: SoftcalShellProps) {
         onToggleFab={() => setFabOpen((prev) => !prev)}
         onFabAction={() => {}}
       />
-      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 py-10">
+      <main className="mx-auto flex w-full flex-col gap-6 py-10">
         {children}
       </main>
     </div>
