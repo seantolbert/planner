@@ -1,5 +1,5 @@
-import { SoftcalScreen } from '@/components/softcal/softcal-screen';
+import { SoftcalScreen } from "@/components/softcal/softcal-screen";
 
-export default function SoftcalPage() {
+export default function SoftcalHomePage() {
   return <SoftcalScreen />;
 }

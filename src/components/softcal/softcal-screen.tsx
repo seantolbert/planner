@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Calendar,
-  CheckSquare2,
-  LayoutDashboard,
-  Package,
-  Plus,
-  StickyNote,
-} from "lucide-react";
+import { Calendar, CheckSquare2, Package, StickyNote } from "lucide-react";
 
 import { CalendarWidget } from "./calendar-widget";
 import {
@@ -33,6 +26,7 @@ import { useEventForm } from "./hooks/use-event-form";
 import { useNoteForm } from "./hooks/use-note-form";
 import { useTaskForm } from "./hooks/use-task-form";
 
+// High-level container that wires data hooks, tab state, and modal orchestration for Softcal.
 export function SoftcalScreen() {
   const [fabOpen, setFabOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -85,15 +79,7 @@ export function SoftcalScreen() {
     computedMaxHeight,
   } = useSoftcalTasks();
 
-  const navItems = [
-    { label: "Overview", Icon: LayoutDashboard },
-    { label: "Calendar", Icon: Calendar },
-    { label: "Tasks", Icon: CheckSquare2 },
-    { label: "Notes", Icon: StickyNote },
-    { label: "Orders", Icon: Package },
-  ];
-  const [activeNav, setActiveNav] = useState(navItems[0].label);
-
+  // Quick actions feed the modal sheet for creating entries.
   const fabActions = [
     { label: "Event", Icon: Calendar },
     { label: "Note", Icon: StickyNote },
@@ -178,6 +164,7 @@ export function SoftcalScreen() {
     setActiveModal("Event");
   };
 
+  // Build modal body dynamically; the bottom sheet reads this single entry point.
   let modalContent: JSX.Element | null = null;
 
   if (activeModal === "Note") {
@@ -273,28 +260,7 @@ export function SoftcalScreen() {
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-b flex flex-col items-center px-4 pr-24 lg:pr-28 text-white">
-      <div className="fixed right-0 top-0 bottom-0 z-40 flex w-16 flex-col items-center gap-3 border-l border-white/10 bg-[#0f141f] py-6 shadow-[0_10px_38px_rgba(0,0,0,0.35)]">
-        {navItems.map(({ label, Icon }) => {
-          const isActive = activeNav === label;
-          return (
-            <button
-              key={label}
-              type="button"
-              aria-label={label}
-              onClick={() => setActiveNav(label)}
-              className={`group flex h-11 w-11 items-center justify-center rounded-xl border text-white/80 transition ${
-                isActive
-                  ? "border-white/50 bg-white/10 text-white"
-                  : "border-white/20 hover:border-white/40 hover:text-white/90"
-              }`}
-            >
-              <Icon size={18} strokeWidth={1.75} />
-            </button>
-          );
-        })}
-      </div>
-
+    <div className="relative min-h-screen w-full bg-gradient-to-b flex flex-col items-center px-4 text-white">
       <SoftcalDateSelector
         monthLabel={monthLabel}
         dayButtons={dayButtons}
@@ -437,42 +403,6 @@ export function SoftcalScreen() {
           Tracking tab content coming soon.
         </div>
       ) : null}
-
-      <div className="fixed bottom-6 right-20 z-50 md:bottom-10 md:right-24">
-        <div className="relative w-14">
-          {fabActions.map((action, index) => {
-            const offset = (index + 1) * 60;
-            const Icon = action.Icon;
-            return (
-              <button
-                key={action.label}
-                type="button"
-                aria-label={action.label}
-                className="absolute right-0 bottom-0 flex h-12 w-12 items-center justify-center rounded-full bg-[#182235] border border-white/30 text-white shadow-[0_10px_28px_rgba(0,0,0,0.3)] transition-all duration-200 ease-out hover:scale-[1.03]"
-                style={{
-                  bottom: fabOpen ? `${offset}px` : "0px",
-                  opacity: fabOpen ? 1 : 0,
-                  pointerEvents: fabOpen ? "auto" : "none",
-                }}
-                onClick={() => openModal(action.label)}
-              >
-                <Icon size={18} />
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          type="button"
-          aria-label="Toggle quick actions"
-          onClick={() => setFabOpen((prev) => !prev)}
-          className={`flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7cc5ff] to-[#4a9be0] text-[#0b111a] shadow-[0_14px_38px_rgba(0,0,0,0.35)] border border-white/40 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 ${
-            fabOpen ? "rotate-45" : "rotate-0"
-          }`}
-        >
-          <Plus size={24} strokeWidth={3} />
-        </button>
-      </div>
 
       <SoftcalBottomSheet
         open={isModalOpen}

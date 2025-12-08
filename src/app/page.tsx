@@ -1,5 +1,5 @@
-import { SoftcalScreen } from '@/components/softcal/softcal-screen';
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return <SoftcalScreen />;
+  redirect("/softcal");
 }
