@@ -5,7 +5,6 @@ const defaultLists = ["Inbox", "Work", "Personal"];
 export function useNoteForm(initialLists: string[] = defaultLists) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [link, setLink] = useState("");
   const [list, setList] = useState(initialLists[0] ?? "Inbox");
   const [listOptions, setListOptions] = useState<string[]>(
     () => [...initialLists]
@@ -29,19 +28,17 @@ export function useNoteForm(initialLists: string[] = defaultLists) {
     () => ({
       title,
       content,
-      link,
       list,
       listOptions,
       showListModal,
       newListName,
     }),
-    [content, link, list, listOptions, newListName, showListModal, title]
+    [content, list, listOptions, newListName, showListModal, title]
   );
 
   const actions = {
     setTitle,
     setContent,
-    setLink,
     setList,
     openListModal,
     closeListModal,

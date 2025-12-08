@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 import { AppProviders } from '@/components/providers/app-providers';
@@ -8,12 +8,15 @@ export const metadata: Metadata = {
   title: 'Softcal',
   description: 'Soft, tactile calendar and task planner concept.',
   manifest: '/manifest.json',
-  themeColor: '#0f172a',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'Softcal'
   }
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0f172a'
 };
 
 interface RootLayoutProps {

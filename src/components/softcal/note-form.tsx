@@ -3,12 +3,10 @@ import { Plus } from "lucide-react";
 interface NoteFormProps {
   title: string;
   content: string;
-  link: string;
   list: string;
   listOptions: string[];
   onChangeTitle: (value: string) => void;
   onChangeContent: (value: string) => void;
-  onChangeLink: (value: string) => void;
   onChangeList: (value: string) => void;
   onOpenListModal: () => void;
 }
@@ -16,12 +14,10 @@ interface NoteFormProps {
 export function NoteForm({
   title,
   content,
-  link,
   list,
   listOptions,
   onChangeTitle,
   onChangeContent,
-  onChangeLink,
   onChangeList,
   onOpenListModal,
 }: NoteFormProps) {
@@ -33,38 +29,20 @@ export function NoteForm({
       }}
     >
       <div className="space-y-2">
-        <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-          Title
-        </label>
         <input
           type="text"
           value={title}
           onChange={(event) => onChangeTitle(event.target.value)}
-          className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/40 focus:border-[#7cc5ff] focus:outline-none"
-          placeholder="Add a title"
+          className="w-full border-none bg-transparent px-0 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-0"
+          placeholder="Title"
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-          Content
-        </label>
         <textarea
           value={content}
           onChange={(event) => onChangeContent(event.target.value)}
-          className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/40 focus:border-[#7cc5ff] focus:outline-none min-h-[180px]"
+          className="w-full min-h-[180px] border-none bg-transparent px-0 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-0"
           placeholder="Write your note..."
-        />
-      </div>
-      <div className="space-y-2">
-        <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-          Link (optional)
-        </label>
-        <input
-          type="url"
-          value={link}
-          onChange={(event) => onChangeLink(event.target.value)}
-          className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/40 focus:border-[#7cc5ff] focus:outline-none"
-          placeholder="https://example.com"
         />
       </div>
       <div className="space-y-2">
@@ -75,7 +53,7 @@ export function NoteForm({
           <select
             value={list}
             onChange={(event) => onChangeList(event.target.value)}
-            className="flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white focus:border-[#7cc5ff] focus:outline-none"
+            className="flex-1 border-none bg-transparent px-0 py-2 text-white focus:outline-none focus:ring-0"
           >
             {listOptions.map((option) => (
               <option key={option} value={option}>

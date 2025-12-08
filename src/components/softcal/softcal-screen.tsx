@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Calendar,
   CheckSquare2,
+  LayoutDashboard,
   Package,
   Plus,
   StickyNote,
@@ -14,6 +15,7 @@ import {
   placeholderCalendarEvents,
   placeholderNotes,
   placeholderOrders,
+  placeholderOrderDetails,
 } from "./data/placeholders";
 import { EventForm } from "./event-form";
 import { SoftcalDateSelector } from "./softcal-date-selector";
@@ -23,7 +25,7 @@ import { SoftcalBottomSheet } from "./softcal-bottom-sheet";
 import { SoftcalTaskPanel } from "./softcal-task-panel";
 import { TaskForm } from "./task-form";
 import type { SoftcalTask } from "./softcal-types";
-import type { PlaceholderNote } from "./data/placeholders";
+import type { PlaceholderNote, PlaceholderOrderDetail } from "./data/placeholders";
 import type { CalendarEvent } from "./calendar-widget";
 import { useSoftcalDates } from "./hooks/use-softcal-dates";
 import { useSoftcalTasks } from "./hooks/use-softcal-tasks";
@@ -83,6 +85,15 @@ export function SoftcalScreen() {
     computedMaxHeight,
   } = useSoftcalTasks();
 
+  const navItems = [
+    { label: "Overview", Icon: LayoutDashboard },
+    { label: "Calendar", Icon: Calendar },
+    { label: "Tasks", Icon: CheckSquare2 },
+    { label: "Notes", Icon: StickyNote },
+    { label: "Orders", Icon: Package },
+  ];
+  const [activeNav, setActiveNav] = useState(navItems[0].label);
+
   const fabActions = [
     { label: "Event", Icon: Calendar },
     { label: "Note", Icon: StickyNote },
@@ -111,9 +122,12 @@ export function SoftcalScreen() {
   const handleNoteSelect = (note: PlaceholderNote) => {
     noteActions.setTitle(note.title);
     noteActions.setContent(note.content);
-    noteActions.setLink(note.link ?? "");
     setActiveModal("Note");
     setFabOpen(false);
+  };
+
+  const handleOrderSelect = (_order: PlaceholderOrderDetail) => {
+    // Placeholder: in future, populate order modal. For now, do nothing.
   };
 
   const selectedDayEvents = placeholderCalendarEvents.filter(
@@ -171,12 +185,10 @@ export function SoftcalScreen() {
       <NoteForm
         title={noteState.title}
         content={noteState.content}
-        link={noteState.link}
         list={noteState.list}
         listOptions={noteState.listOptions}
         onChangeTitle={noteActions.setTitle}
         onChangeContent={noteActions.setContent}
-        onChangeLink={noteActions.setLink}
         onChangeList={noteActions.setList}
         onOpenListModal={noteActions.openListModal}
       />
@@ -261,7 +273,28 @@ export function SoftcalScreen() {
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-b flex flex-col items-center px-4 text-white">
+    <div className="relative min-h-screen w-full bg-gradient-to-b flex flex-col items-center px-4 pr-24 lg:pr-28 text-white">
+      <div className="fixed right-0 top-0 bottom-0 z-40 flex w-16 flex-col items-center gap-3 border-l border-white/10 bg-[#0f141f] py-6 shadow-[0_10px_38px_rgba(0,0,0,0.35)]">
+        {navItems.map(({ label, Icon }) => {
+          const isActive = activeNav === label;
+          return (
+            <button
+              key={label}
+              type="button"
+              aria-label={label}
+              onClick={() => setActiveNav(label)}
+              className={`group flex h-11 w-11 items-center justify-center rounded-xl border text-white/80 transition ${
+                isActive
+                  ? "border-white/50 bg-white/10 text-white"
+                  : "border-white/20 hover:border-white/40 hover:text-white/90"
+              }`}
+            >
+              <Icon size={18} strokeWidth={1.75} />
+            </button>
+          );
+        })}
+      </div>
+
       <SoftcalDateSelector
         monthLabel={monthLabel}
         dayButtons={dayButtons}
@@ -381,8 +414,21 @@ export function SoftcalScreen() {
       ) : null}
 
       {activeTab === "Orders" ? (
-        <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/80">
-          Orders tab content coming soon.
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 w-full max-w-5xl mx-auto">
+          {placeholderOrderDetails.map((order, idx) => (
+            <div
+              key={`${order.orderNumber}-${idx}`}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/80"
+            >
+              <div className="text-white font-semibold">{order.title}</div>
+              <div className="text-white/70 text-sm">Order #: {order.orderNumber}</div>
+              <div className="text-white/70 text-sm">Purchased: {order.purchaseDate}</div>
+              <div className="text-white/70 text-sm">Ship by: {order.shipByDate}</div>
+              {order.notes ? (
+                <div className="text-white/60 text-sm mt-1">{order.notes}</div>
+              ) : null}
+            </div>
+          ))}
         </div>
       ) : null}
 
@@ -392,7 +438,7 @@ export function SoftcalScreen() {
         </div>
       ) : null}
 
-      <div className="fixed bottom-6 right-6 z-50 md:bottom-10 md:right-10">
+      <div className="fixed bottom-6 right-20 z-50 md:bottom-10 md:right-24">
         <div className="relative w-14">
           {fabActions.map((action, index) => {
             const offset = (index + 1) * 60;
