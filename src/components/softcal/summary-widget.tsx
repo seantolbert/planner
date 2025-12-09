@@ -14,7 +14,7 @@ export function SummaryWidget() {
         <div className="flex flex-col gap-1 text-white">
           <div className="text-sm font-semibold text-white/80">Dashboard</div>
           <div className="text-2xl font-bold">Today at a glance</div>
-          <div className="text text-white/80 line-clamp-2">
+          <div className="text text-white/80 line-clamp-3">
             Quick overview of tasks, orders, events, and notes. and neat lines
             and there are a ot of stuff theres \evebn a fourth line coming up
             here whats that, gtheres a fifth line like what the heck can there
