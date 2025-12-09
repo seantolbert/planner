@@ -4,20 +4,22 @@ import { EventsWidget } from "./events-widget";
 import { DashboardNotesWidget } from "./dashboard-notes-widget";
 import { OrdersWidget } from "./orders-widget";
 import { TasksWidget } from "./tasks-widget";
+import { SummaryWidget } from "./summary-widget";
 
 // Home screen dashboard
 export function HomeScreen() {
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-b from-[#0b111a] to-[#0f1522] flex flex-col items-center px-4 text-white">
-      <div className="w-full max-w-5xl">
-        <div className="grid grid-cols-1 gap-4">
+    <div className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-[#0b111a] to-[#0f1522] flex flex-col items-center px-2 text-white">
+      <div className="flex w-full max-w-5xl flex-col gap-3">
+        <SummaryWidget />
+        <div className="grid grid-cols-1 gap-3">
           <TasksWidget />
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           <DashboardNotesWidget />
           <OrdersWidget />
         </div>
-        <div className="mt-4 grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           <EventsWidget />
         </div>
       </div>

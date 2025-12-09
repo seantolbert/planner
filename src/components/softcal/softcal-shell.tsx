@@ -127,9 +127,7 @@ export function SoftcalShell({ children }: SoftcalShellProps) {
         onToggleFab={() => setFabOpen((prev) => !prev)}
         onFabAction={() => {}}
       />
-      <main className="mx-auto flex w-full flex-col gap-6 py-10">
-        {children}
-      </main>
+      <main className="mx-auto flex w-full flex-col gap-6">{children}</main>
     </div>
   );
 }

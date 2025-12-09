@@ -17,10 +17,6 @@ export function TasksWidget() {
       <div className="relative flex items-center justify-between">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-white/80">Tasks</div>
-          <div className="text-lg font-semibold text-white">High priority</div>
-        </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-white shadow-inner">
-          <CheckSquare2 size={20} strokeWidth={2.25} />
         </div>
       </div>
       <div className="relative mt-3 space-y-2">
@@ -35,7 +31,9 @@ export function TasksWidget() {
               className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-3 py-2 text-white"
             >
               <span className="font-semibold line-clamp-1">{task.title}</span>
-              <span className="text-xs text-white/70">{task.frequency ?? ""}</span>
+              <span className="text-xs text-white/70">
+                {task.frequency ?? ""}
+              </span>
             </div>
           ))
         )}
