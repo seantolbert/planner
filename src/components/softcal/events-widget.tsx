@@ -25,7 +25,10 @@ export function EventsWidget() {
   );
 
   const upcoming = [...placeholderCalendarEvents]
-    .sort((a, b) => parseEventDateTime(a).getTime() - parseEventDateTime(b).getTime())
+    .sort(
+      (a, b) =>
+        parseEventDateTime(a).getTime() - parseEventDateTime(b).getTime()
+    )
     .slice(0, 2);
 
   const monthLabel = today.toLocaleString("en-US", { month: "short" });
@@ -34,40 +37,47 @@ export function EventsWidget() {
 
   return (
     <div className="group relative flex overflow-hidden rounded-3xl border border-[#7cc5ff]/70 bg-white/5 p-3 shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.35)]">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#7cc5ff]/25 to-[#4a9be0]/10" aria-hidden />
-      <div className="relative flex w-full flex-col gap-3 md:flex-row">
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-[#7cc5ff]/25 to-[#4a9be0]/10"
+        aria-hidden
+      />
+      <div className="relative flex w-full flex-col-2 gap-3 md:flex-row">
         <div className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-[#7cc5ff] to-[#4a9be0] p-3 text-white shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
-          <div className="flex items-start justify-between">
+          <div className="flex justify-between">
             <div>
               <div className="text-sm font-semibold uppercase tracking-wide opacity-80">
                 Today
               </div>
-              <div className="text-3xl font-bold leading-tight">{monthLabel}</div>
+              <div className="text-3xl font-bold leading-tight">
+                {monthLabel}
+              </div>
               <div className="text-5xl font-black leading-none">{dayNum}</div>
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-white">
-              <Calendar size={22} strokeWidth={2.25} />
             </div>
           </div>
           <div className="mt-2 text-xs text-white/90">
-            {weekday} • {todayEvents.length} event{todayEvents.length === 1 ? "" : "s"}
+            {weekday} • {todayEvents.length} event
+            {todayEvents.length === 1 ? "" : "s"}
           </div>
         </div>
 
-        <div className="relative flex flex-1 flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-3 text-white/90">
+        <div className="relative flex flex-1 flex-col justify-evenly rounded-2xl p-1 text-white/90">
           <div className="text-sm font-semibold text-white">Upcoming</div>
-          <div className="mt-2 space-y-2">
+          <div className="space-y-2">
             {upcoming.map((event, idx) => {
               const start = event.startTime ?? "";
               const end = event.endTime ?? "";
               return (
                 <div
                   key={`${event.title}-${idx}`}
-                  className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2"
+                  className="flex items-center justify-between"
                 >
                   <div className="flex flex-col">
-                    <span className="font-semibold text-white line-clamp-1">{event.title}</span>
-                    <span className="text-xs text-white/70">{start} {start && end ? "–" : ""} {end}</span>
+                    <span className="font-semibold text-white text-xs">
+                      {event.title}
+                    </span>
+                    <span className="text-xs text-white/70">
+                      {start} {start && end ? "–" : ""} {end}
+                    </span>
                   </div>
                   <span
                     className="h-2 w-2 rounded-full"
